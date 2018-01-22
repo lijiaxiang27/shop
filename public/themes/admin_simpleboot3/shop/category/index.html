@@ -1,0 +1,61 @@
+<include file="public@header" />
+</head>
+<body>
+	<div class="wrap">
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="{:url('Category/index')}">分类管理</a></li>
+			<li><a href="{:url('Category/add')}">添加分类</a></li>
+		</ul>
+		<form method="post" class="js-ajax-form" action="{:url('Category/listOrder')}">
+			<!--<div class="table-actions">-->
+				<!--<button type="submit" class="btn btn-primary btn-sm js-ajax-submit">{:lang('SORT')}</button>-->
+			<!--</div>-->
+			<table class="table table-hover table-bordered table-list">
+				<thead>
+					<tr>
+						<!--<th width="50">排序</th>-->
+						<th width="50">ID</th>
+						<th width="100">分类名称</th>
+						<th>规格</th>
+						<th width="180">操作</th>
+					</tr>
+				</thead>
+				<tbody>
+					<volist name="category" id="vo">
+						<tr>
+							<td>{$vo.category_id}</td>
+							<td>{$vo.category_name}</td>
+							<td>
+								{$vo.tids}
+							</td>
+
+							<td>
+								<if condition="$vo['category_id'] eq 1">
+									默认分类 不可操作
+									<else/>
+									<a href="{:url('Category/save',array('category_id'=>$vo['category_id']))}">{:lang('EDIT')}</a>
+									<a href="{:url('Category/del',array('category_id'=>$vo['category_id']))}" class="js-ajax-delete" data-msg="确定删除该类型及其所有属性吗？">{:lang('DELETE')}</a>
+								</if>
+
+							</td>
+						</tr>
+					</volist>
+				</tbody>
+				<tfoot>
+					<tr>
+						<!--<th width="50">排序</th>-->
+						<th width="50">ID</th>
+						<th width="100">分类名称</th>
+						<th>规格</th>
+						<th width="180">操作</th>
+					</tr>
+				</tfoot>
+			</table>
+			<!--<div class="table-actions">-->
+				<!--<button type="submit" class="btn btn-primary btn-sm js-ajax-submit">{:lang('SORT')}</button>-->
+			<!--</div>-->
+		</form>
+	</div>
+	<script src="__STATIC__/js/admin.js"></script>
+</body>
+</html>

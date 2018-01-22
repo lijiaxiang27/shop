@@ -1,0 +1,63 @@
+<include file="public@header" />
+</head>
+<body>
+	<div class="wrap">
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="{:url('Attr/type_index')}">规格管理</a></li>
+			<li><a href="{:url('Attr/type_add')}">规格添加</a></li>
+		</ul>
+		<form method="post" class="js-ajax-form" action="{:url('Category/listOrder')}">
+			<!--<div class="table-actions">-->
+				<!--<button type="submit" class="btn btn-primary btn-sm js-ajax-submit">{:lang('SORT')}</button>-->
+			<!--</div>-->
+			<table class="table table-hover table-bordered table-list">
+				<thead>
+					<tr>
+						<!--<th width="50">排序</th>-->
+						<th width="50">ID</th>
+						<th width="100">规格名称</th>
+						<th>规格详情</th>
+						<th width="180">操作</th>
+					</tr>
+				</thead>
+				<tbody>
+					<volist name="data" id="vo" key="key">
+						<tr>
+							<td>{$vo.0.type_id}</td>
+							<td>{$key}</td>
+							<td>
+								<volist name="vo" id="v">
+									{:$v.attr_name==''?'':$v.attr_name.';';}
+								</volist>
+							</td>
+							<td>
+								<if condition="$vo.0.type_id eq 1">
+									默认数据  不可操作
+									<else/>
+									<a href="{:url('Attr/type_save',array('attr_type'=>$vo.0.type_id))}">{:lang('EDIT')}</a>
+									<a href="{:url('Attr/type_del',array('attr_type'=>$vo.0.type_id))}" class="js-ajax-delete">{:lang('DELETE')}</a>
+								</if>
+
+
+							</td>
+						</tr>
+					</volist>
+				</tbody>
+				<tfoot>
+					<tr>
+						<!--<th width="50">排序</th>-->
+						<th width="50">ID</th>
+						<th width="100">规格名称</th>
+						<th>规格详情</th>
+						<th width="180">操作</th>
+					</tr>
+				</tfoot>
+			</table>
+			<!--<div class="table-actions">-->
+				<!--<button type="submit" class="btn btn-primary btn-sm js-ajax-submit">{:lang('SORT')}</button>-->
+			<!--</div>-->
+		</form>
+	</div>
+	<script src="__STATIC__/js/admin.js"></script>
+</body>
+</html>
