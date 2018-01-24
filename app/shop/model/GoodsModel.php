@@ -9,18 +9,46 @@
 namespace app\shop\model;
 
 
+use app\portal\controller\SearchController;
 use think\Db;
 use think\Model;
 use think\Request;
 
 class GoodsModel extends Model
 {
-    public function getGoods()
+    /**
+     * 获取全部商品
+     * @param int $limit
+     * @return \think\Paginator
+     */
+    public function getGoods($limit = 20)
     {
-        //获取所有商品
-        $goods =  $this -> field('goods_content,goods_img',true) -> where('goods_stu',1) -> paginate();
+        //获取商品
+        $goods =  $this
+            -> field('goods_content,goods_img',true)
+            -> where('goods_stu',1)
+            -> order('goods_order,goods_id','desc')
+            -> paginate($limit);
 
-        return $goods -> toArray();
+        return $goods;
+    }
+
+    /**
+     * 获取全部分类
+     * @return mixed   array （ID => name）一维数组
+     */
+    public function getCategory()
+    {
+        $data = Db::name('category')
+            -> field('category_id,category_name')
+            -> select();
+
+        foreach ($data as $k => $v)
+        {
+            $cate[$v['category_id']] = $v['category_name'];
+        }
+
+        return $cate;
     }
 
     /**
@@ -32,7 +60,6 @@ class GoodsModel extends Model
         $param = Request::instance()->param();
         $goods = $param["goods"];
         $goods['create_time'] = date('Y-m-d H:i:s',time());
-        $c_id  = $param['goods_category'];
         //处理sku
         foreach ($param['attr'] as $k => $v)
         {
@@ -41,15 +68,14 @@ class GoodsModel extends Model
             $attr[$k]['goods_number'] = $param['goods_number'][$v];
         }
         //处理上传的商品相集
-        if(isset($param['photo_urls']))
+        if(!isset($param['photo_urls'])||empty($param['poto_urls']))
         {
             //TODO 未上传图片时 默认的图片
-            $images[] = '"shop/20180122/7c25961c435ed33bec195532fbbd6003.jpg';
+            $images[] = 'shop/20180122/7c25961c435ed33bec195532fbbd6003.jpg';
         }else{
             $images = $param['photo_urls'];
         }
         $goods['goods_img'] = implode(';',$images);
-
         $stu = true;
         //开启事务
         $this -> startTrans();
@@ -68,4 +94,28 @@ class GoodsModel extends Model
         return $stu;
 
     }
+
+   public function getDetails($gid)
+   {
+       //返回
+       return $this -> find($gid);
+   }
+
+    /**
+     * 获取商品延展属性
+     * @param $gid
+     * @return false|\PDOStatement|string|\think\Collection
+     */
+   public function getGoodsAttr($gid)
+   {
+       //获取商品延展的属性
+       return Db::name('goods_attribute ga')
+           ->field('`id`,`goods_number`,`sell_price`,ga.attr_id,a.attr_name')
+           -> join('attribute a','ga.attr_id = a.attr_id','left')
+           -> where('ga.g_id',$gid)
+           -> select();
+   }
+
+
+
 }

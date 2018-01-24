@@ -30,24 +30,24 @@
 <div class="wrap js-check-wrap">
     <ul class="nav nav-tabs">
         <li><a href="{:url('Goods/index')}">商品管理</a></li>
-        <li class="active"><a href="{:url('Goods/add')}">添加商品</a></li>
+        <li class="active"><a href="{:url('Goods/save')}">商修改品</a></li>
     </ul>
-    <form action="{:url('Goods/add')}" method="post" class="form-horizontal js-ajax-form margin-top-20">
         <div class="row">
             <div class="col-md-9">
                 <table class="table table-bordered">
+                    <form action="{:url('Goods/save')}" method="post" class="form-horizontal js-ajax-form margin-top-20">
 
                     <tr>
                         <th>商品名称<span class="form-required">*</span></th>
                         <td>
                             <input class="form-control" type="text" name="goods[goods_name]"
-                                   id="title" required value="" placeholder="请输入商品名称"/>
+                                   id="title" required value="{$good.goods_name}" placeholder="请输入商品名称"/>
                         </td>
                     </tr>
                     <tr>
                         <th>商品价格￥</th>
                         <td>
-                            <input class="form-control" type="text" name="goods[goods_price]" id="keywords" value=""
+                            <input class="form-control" type="text" name="goods[goods_price]" id="keywords" value="{$good.goods_price}"
                                    placeholder="请输入商品价格">
                             <p class="help-block">最多保留两位小数（人民币单位：分）</p>
                         </td>
@@ -56,9 +56,13 @@
                         <th>商品分类</th>
                         <td>
                             <select name="goods[category_id]" id="checkCategroy">
-                                <option value="0">选择商品分类</option>
-                                <volist name="category" id="vo">
-                                    <option value="{$vo.category_id}">{$vo.category_name}</option>
+                                <volist name="cate" id="vo">
+                                    <if condition="$good['category_id'] eq $vo.category_id ">
+                                        <option value="{$vo.category_id}" selected>{$vo.category_name}</option>
+                                        <else/>
+                                        <option value="{$vo.category_id}">{$vo.category_name}</option>
+                                    </if>
+
                                 </volist>
                             </select>
                         </td>
@@ -68,11 +72,6 @@
                         //根据选择的分类获取规格及属性
                         $("#checkCategroy").change(function () {
                             var cid = $(this).val();
-                            if (cid == 0)
-                            {
-                                $("#checkAttr").html('选择分类后方可选择属性');
-                                return
-                            }
                             $.ajax({
                                 url:"{:url('Goods/ajax_attribute')}?cid="+cid,
                                 type:'get',
@@ -99,29 +98,63 @@
                     <tr>
                         <th>选择属性</th>
                         <td id="checkAttr">
-                            <p>选择分类才可以选择属性</p>
+                            <lable style="color: red;font-size: 6px">属性后面填写的价格为此属性附加价格，非商品价格</lable>
+                            <volist name="attr" id="vo" key="key">
+                                <!--类型-->
+                                <p>{$key}：<br/>
+                                    <!--类型下的所有规格-->
+                                    <volist name="vo" id="val">
+
+                                            <!--如果stu==1 则选中 并展示其属性-->
+
+                                            <if condition="$val.stu eq 1">
+                                                <input type="checkbox" name="attr[]" checked value="{$val.attr_id}">{$val.attr_name}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;加价:￥ <input type="text" name="attr_price[]" size="7" value="{$val.sell_price}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;库存:  <input type="number" name="goods_number[]" size="4" value="{$val.goods_number}"><br/>
+                                                <!--否则不选，展示默认-->
+                                                <else/>
+                                                <input type="checkbox" name="attr[]" value="{$val.attr_id}">{$val.attr_name}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;加价:￥ <input type="text" name="attr_price[]" size="7" value="0.0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;库存:  <input type="number" name="goods_number[]" size="4" value="9999"><br/>
+                                            </if>
+
+                                    </volist>
+
+                                </p>
+
+                            </volist>
 
                         </td>
+
                     </tr>
                     <tr>
                         <th>商品简述</th>
                         <td>
                             <textarea class="form-control" name="goods[goods_brief]" style="height: 50px;"
-                                      placeholder="请填写简述"></textarea>
+                                    placeholder="请填写简述">{$good.goods_brief}</textarea>
                         </td>
                     </tr>
                     <tr>
                         <th>商品详情</th>
                         <td>
-                            <script type="text/plain" id="content" name="goods[goods_content]"></script>
+                            <script type="text/plain" id="content" name="goods[goods_content]">{:htmlspecialchars_decode($good.goods_content)}</script>
                         </td>
                     </tr>
                     <tr>
                         <th>商品相册</th>
                         <td>
-                            <ul id="photos" class="pic-list list-unstyled form-inline"></ul>
+                            <notempty name="good.goods_img">
+                                <ul id="photos" class="pic-list list-unstyled form-inline">
+                                    <php>$img = explode(';',$good['goods_img']);</php>
+                                    <volist name="img" id="vo">
+                                        <php>$vo=cmf_get_image_preview_url($vo)</php>
+                                        <li id="saved-imageid1516760222452{$key}">
+                                            <input id="photo-id1516760222452{$key}" type="hidden" name="photo_urls[]" value="{$vo}">
+                                            <img id="photo-id1516760222452{$key}-preview" src="{$vo}" style="height:36px;width: 36px;" onclick="imagePreviewDialog(this.src);">
+                                            <a href="javascript:uploadOneImage('图片上传','#photo-id1516760222452{$key}');">替换</a>
+                                            <a href="javascript:(function(){$('#saved-imageid1516760222452{$key}').remove();})();">移除</a>
+                                        </li>
+                                    </volist>
+                                </ul>
+                            </notempty>
                             <a href="javascript:uploadMultiImage('图片上传','#photos','photos-item-tpl');"
-                               class="btn btn-default btn-sm">选择图片</a>
+                               class="btn btn-sm btn-default">选择图片</a>
                         </td>
                     </tr>
                   <!--  <tr>
@@ -136,6 +169,7 @@
                 </table>
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
+
                         <button type="submit" class="btn btn-primary js-ajax-submit">{:lang('ADD')}</button>
                         <a class="btn btn-default" href="{:url('Goods/index')}">{:lang('BACK')}</a>
                     </div>

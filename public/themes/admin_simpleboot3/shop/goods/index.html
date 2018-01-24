@@ -26,49 +26,10 @@
         <a class="btn btn-danger" href="{:url('Goods/index')}">清空</a>
     </form>
     <form class="js-ajax-form" action="" method="post">
-        <div class="table-actions">
-            <notempty name="category">
-                <button class="btn btn-primary btn-sm js-ajax-submit" type="submit"
-                        data-action="{:url('Goods/listOrder')}">{:lang('SORT')}
-                </button>
-            </notempty>
-            <button class="btn btn-primary btn-sm js-ajax-submit" type="submit"
-                    data-action="{:url('Goods/publish',array('yes'=>1))}" data-subcheck="true">发布
-            </button>
-            <button class="btn btn-primary btn-sm js-ajax-submit" type="submit"
-                    data-action="{:url('Goods/publish',array('no'=>1))}" data-subcheck="true">取消发布
-            </button>
-            <button class="btn btn-primary btn-sm js-ajax-submit" type="submit"
-                    data-action="{:url('Goods/top',array('yes'=>1))}" data-subcheck="true">置顶
-            </button>
-            <button class="btn btn-primary btn-sm js-ajax-submit" type="submit"
-                    data-action="{:url('Goods/top',array('no'=>1))}" data-subcheck="true">取消置顶
-            </button>
-            <button class="btn btn-primary btn-sm js-ajax-submit" type="submit"
-                    data-action="{:url('Goods/recommend',array('yes'=>1))}" data-subcheck="true">推荐
-            </button>
-            <button class="btn btn-primary btn-sm js-ajax-submit" type="submit"
-                    data-action="{:url('Goods/recommend',array('no'=>1))}" data-subcheck="true">取消推荐
-            </button>
-            <!--
-            <notempty name="category">
-                <button class="btn btn-primary btn-sm js-articles-move" type="button">批量移动</button>
-            </notempty>
-            <button class="btn btn-primary btn-sm js-articles-copy" type="button">批量复制</button>
-            -->
-            <button class="btn btn-danger btn-sm js-ajax-submit" type="submit"
-                    data-action="{:url('Goods/delete')}" data-subcheck="true" data-msg="您确定删除吗？">
-                {:lang('DELETE')}
-            </button>
-        </div>
+
         <table class="table table-hover table-bordered table-list">
             <thead>
             <tr>
-                <th width="15">
-                    <label>
-                        <input type="checkbox" class="js-check-all" data-direction="x" data-checklist="js-check-x">
-                    </label>
-                </th>
                 <notempty name="category">
                     <th width="50">{:lang('SORT')}</th>
                 </notempty>
@@ -76,70 +37,59 @@
                 <th width="50">商品名称</th>
                 <th width="50">所属分类</th>
                 <th width="50">价格</th>
-                <th width="65">总库存</th>
-                <th width="100">商品图片</th>
                 <th width="50">商品状态</th>
+                <th width="50">是否包邮</th>
                 <th width="130">发布时间</th>
-                <th width="70">状态</th>
                 <th width="90">操作</th>
             </tr>
             </thead>
+            <thbody>
+                <volist name="goods" id="vo">
+                    <tr>
+                        <td>{$vo.goods_id}</td>
+                        <td>{$vo.goods_name}</td>
+                        <td>{$cate[$vo.category_id]}</td>
+                        <td>{$vo.goods_price}</td>
+                        <td>
+                        <if condition="$vo.goods_stu eq 1">
+                            正常
+                            <else/>
+                            隐藏
+                        </if>
+                        </td>
+                        <td>
+                        <if condition="$vo.is_send eq 1">
+                            不包邮
+                            <else/>
+                            包邮
+                        </if>
+                        </td>
+                        <td>{$vo.create_time}</td>
+                        <td>
+                            <a href="{:url('Goods/save',array('goods_id'=>$vo['goods_id']))}">{:lang('EDIT')}</a>
+                                <a href="{:url('Goods/del',array('goods_id'=>$vo['goods_id']))}" class="js-ajax-delete" data-msg="确定删除该商品吗？">{:lang('DELETE')}</a>
+                        </td>
 
+                    </tr>
+                </volist>
+            </thbody>
             <tfoot>
             <tr>
-                <th width="15"><label><input type="checkbox" class="js-check-all" data-direction="x"
-                                             data-checklist="js-check-x"></label></th>
                 <notempty name="category">
                     <th width="50">{:lang('SORT')}</th>
                 </notempty>
-                <th width="50 ">ID</th>
+                <th width="50">ID</th>
                 <th width="50">商品名称</th>
                 <th width="50">所属分类</th>
                 <th width="50">价格</th>
-                <th width="65">总库存</th>
-                <th width="100">商品图片</th>
                 <th width="50">商品状态</th>
+                <th width="50">是否包邮</th>
                 <th width="130">发布时间</th>
-                <th width="70">状态</th>
                 <th width="90">操作</th>
             </tr>
             </tfoot>
         </table>
-        <div class="table-actions">
-            <notempty name="category">
-                <button class="btn btn-primary btn-sm js-ajax-submit" type="submit"
-                        data-action="{:url('Goods/listOrder')}">{:lang('SORT')}
-                </button>
-            </notempty>
-            <button class="btn btn-primary btn-sm js-ajax-submit" type="submit"
-                    data-action="{:url('Goods/publish',array('yes'=>1))}" data-subcheck="true">发布
-            </button>
-            <button class="btn btn-primary btn-sm js-ajax-submit" type="submit"
-                    data-action="{:url('Goods/publish',array('no'=>1))}" data-subcheck="true">取消发布
-            </button>
-            <button class="btn btn-primary btn-sm js-ajax-submit" type="submit"
-                    data-action="{:url('Goods/top',array('yes'=>1))}" data-subcheck="true">置顶
-            </button>
-            <button class="btn btn-primary btn-sm js-ajax-submit" type="submit"
-                    data-action="{:url('Goods/top',array('no'=>1))}" data-subcheck="true">取消置顶
-            </button>
-            <button class="btn btn-primary btn-sm js-ajax-submit" type="submit"
-                    data-action="{:url('Goods/recommend',array('yes'=>1))}" data-subcheck="true">推荐
-            </button>
-            <button class="btn btn-primary btn-sm js-ajax-submit" type="submit"
-                    data-action="{:url('Goods/recommend',array('no'=>1))}" data-subcheck="true">取消推荐
-            </button>
-            <!--
-            <notempty name="category">
-                <button class="btn btn-primary btn-sm js-articles-move" type="button">批量移动</button>
-            </notempty>
-            <button class="btn btn-primary btn-sm js-articles-copy" type="button">批量复制</button>
-            -->
-            <button class="btn btn-danger btn-sm js-ajax-submit" type="submit"
-                    data-action="{:url('Goods/delete')}" data-subcheck="true" data-msg="您确定删除吗？">
-                {:lang('DELETE')}
-            </button>
-        </div>
+
         <ul class="pagination">{$page|default=''}</ul>
     </form>
 </div>
