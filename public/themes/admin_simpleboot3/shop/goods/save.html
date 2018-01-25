@@ -32,11 +32,12 @@
         <li><a href="{:url('Goods/index')}">商品管理</a></li>
         <li class="active"><a href="{:url('Goods/save')}">商修改品</a></li>
     </ul>
+    <form action="{:url('Goods/save')}" method="post" class="form-horizontal js-ajax-form margin-top-20">
         <div class="row">
             <div class="col-md-9">
                 <table class="table table-bordered">
-                    <form action="{:url('Goods/save')}" method="post" class="form-horizontal js-ajax-form margin-top-20">
 
+                        <input type="hidden" name="goods_id" value="{$good.goods_id}">
                     <tr>
                         <th>商品名称<span class="form-required">*</span></th>
                         <td>
@@ -68,32 +69,37 @@
                         </td>
                     </tr>
 
-                    <script>
-                        //根据选择的分类获取规格及属性
-                        $("#checkCategroy").change(function () {
-                            var cid = $(this).val();
-                            $.ajax({
-                                url:"{:url('Goods/ajax_attribute')}?cid="+cid,
-                                type:'get',
-                                data:'',
-                                dataType:'json',
-                                success:function(data)
+                        <script>
+                            //根据选择的分类获取规格及属性
+                            $("#checkCategroy").change(function () {
+                                var cid = $(this).val();
+                                if (cid == 0)
                                 {
-                                    console.log(data);
-                                    var str = '<lable style="color: red;font-size: 6px" >属性后面填写的价格为此属性附加价格，非商品价格</lable>';
-                                    for(var i in data){
-                                        str += '<p>'+i+'：<br/>';
-                                        $.each(data[i], function (n, value) {
-                                            str +='<input type="checkbox" name="attr[]" checked value="'+value.attr_id+'" >'+value.attr_name+'&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp';
-                                            str += '加价:￥ <input type="text" name="attr_price['+value.attr_id+']" size="7" value="0.00">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp';
-                                            str += '库存:  <input type="number" name="goods_number['+value.attr_id+']" size="4" value="9999"><br/>'
-                                        });
-                                    }
-                                    $("#checkAttr").html(str);
+                                    $("#checkAttr").html('选择分类后方可选择属性');
+                                    return
                                 }
+                                $.ajax({
+                                    url:"{:url('Goods/ajax_attribute')}?cid="+cid,
+                                    type:'get',
+                                    data:'',
+                                    dataType:'json',
+                                    success:function(data)
+                                    {
+                                        console.log(data);
+                                        var str = '<lable style="color: red;font-size: 6px" >属性后面填写的价格为此属性附加价格，非商品价格</lable>';
+                                        for(var i in data){
+                                            str += '<p>'+i+'：<br/>';
+                                            $.each(data[i], function (n, value) {
+                                                str +='<input type="checkbox" name="attr[]" checked value="'+value.attr_id+'" >'+value.attr_name+'&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp';
+                                                str += '加价:￥ <input type="text" name="attr_price['+value.attr_id+']" size="7" value="0.00">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp';
+                                                str += '库存:  <input type="number" name="goods_number['+value.attr_id+']" size="4" value="9999"><br/>'
+                                            });
+                                        }
+                                        $("#checkAttr").html(str);
+                                    }
+                                })
                             })
-                        })
-                    </script>
+                        </script>
 
                     <tr>
                         <th>选择属性</th>
@@ -106,12 +112,11 @@
                                     <volist name="vo" id="val">
 
                                             <!--如果stu==1 则选中 并展示其属性-->
-
                                             <if condition="$val.stu eq 1">
-                                                <input type="checkbox" name="attr[]" checked value="{$val.attr_id}">{$val.attr_name}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;加价:￥ <input type="text" name="attr_price[]" size="7" value="{$val.sell_price}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;库存:  <input type="number" name="goods_number[]" size="4" value="{$val.goods_number}"><br/>
+                                                <input type="checkbox" name="attr[]" checked value="{$val.attr_id}">{$val.attr_name}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;加价:￥ <input type="text" name="attr_price[{$val.attr_id}]" size="7" value="{$val.sell_price}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;库存:  <input type="number" name="goods_number[{$val.attr_id}]" size="4" value="{$val.goods_number}"><br/>
                                                 <!--否则不选，展示默认-->
                                                 <else/>
-                                                <input type="checkbox" name="attr[]" value="{$val.attr_id}">{$val.attr_name}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;加价:￥ <input type="text" name="attr_price[]" size="7" value="0.0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;库存:  <input type="number" name="goods_number[]" size="4" value="9999"><br/>
+                                                <input type="checkbox" name="attr[]" value="{$val.attr_id}">{$val.attr_name}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;加价:￥ <input type="text" name="attr_price[{$val.attr_id}]" size="7" value="0.0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;库存:  <input type="number" name="goods_number[{$val.attr_id}]" size="4" value="9999"><br/>
                                             </if>
 
                                     </volist>
@@ -166,11 +171,12 @@
                                class="btn btn-sm btn-default">选择文件</a>
                         </td>
                     </tr>-->
+
                 </table>
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
 
-                        <button type="submit" class="btn btn-primary js-ajax-submit">{:lang('ADD')}</button>
+                        <button type="submit" class="btn btn-primary js-ajax-submit">{:lang('EDIT')}</button>
                         <a class="btn btn-default" href="{:url('Goods/index')}">{:lang('BACK')}</a>
                     </div>
                 </div>

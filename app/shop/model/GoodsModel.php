@@ -55,10 +55,14 @@ class GoodsModel extends Model
      * 添加商品
      * @return bool
      */
-    public function addGoods()
+    public function addGoods($gid)
     {
         $param = Request::instance()->param();
         $goods = $param["goods"];
+        if (isset($gid))
+        {
+            $goods['goods_id'] = $gid;
+        }
         $goods['create_time'] = date('Y-m-d H:i:s',time());
         //处理sku
         foreach ($param['attr'] as $k => $v)
@@ -87,12 +91,31 @@ class GoodsModel extends Model
         {
             $attr[$k]['g_id'] = $gid;
         }
-        $stu = Db::name('goods_attribute') -> insertAll($attr)?$stu:false;
+        $stu = Db::name('goods_attribute') -> insertAll($attr)!==false?$stu:false;
         //提交 or 回滚
         $stu?$this -> commit():$this ->rollback();
 
         return $stu;
 
+    }
+    public function doDel($gid = 0,$type=false)
+    {
+        if ($gid ==0){
+            $gid = Request::instance() -> param('goods_id');
+        }
+
+        $stu = true;
+        //开启事务
+        $this -> startTrans();
+        $stu = $this -> where('goods_id',$gid) -> delete()?$stu:false;
+        $stu = Db::name('goods_attribute') -> where('g_id',$gid) -> delete()!==false?$stu:false;
+        if ($type)
+        {
+            $stu = $this->addGoods($gid)!==false?$stu:false;
+        }
+        $stu?$this -> commit():$this -> rollback();
+
+        return $stu;
     }
 
    public function getDetails($gid)

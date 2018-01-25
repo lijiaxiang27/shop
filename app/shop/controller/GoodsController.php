@@ -68,6 +68,11 @@ class GoodsController extends AdminBaseController
     }
 
 
+    /**
+     * 修改商品
+     * @param Request $request
+     * @return mixed
+     */
     public function  save(Request $request)
     {
         if($request -> isGet())
@@ -90,12 +95,25 @@ class GoodsController extends AdminBaseController
 
         if ($request -> isPost())
         {
-            $param = $request -> param();
-            dump($param);
+//            dump($request->param());die;
+            $gid = $request -> param('goods_id');
+            //$this -> model ->doDel($gid,true);die;
+            if($this -> model ->doDel($gid,true))
+            {
+                $this -> success('修改成功');
+            }else{
+                $this -> error('修改失败');
+            }
         }
 
     }
 
+    /**
+     * 处理商品规格属性结合
+     * @param $attr
+     * @param $all
+     * @return mixed
+     */
     private static function _do_goodsAttr($attr,$all)
     {
         $arr = array();
@@ -127,7 +145,12 @@ class GoodsController extends AdminBaseController
 
     public function  del()
     {
-        echo 'add';
+        if($this -> model ->doDel())
+        {
+            $this -> success('修改成功');
+        }else{
+            $this -> error('修改失败');
+        }
     }
 
     public function get_detailed()
